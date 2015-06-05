@@ -2,6 +2,7 @@ package main
 
 import (
     "encoding/json"
+    "encoding/base64"
     "strings"
     "database/sql"
     "log"
@@ -21,17 +22,30 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func queryApi(w http.ResponseWriter, r *http.Request) {
+    var command string
     params := r.URL.Query()
     table := params.Get("t")
     format := params.Get("f")
+    filter := params.Get("w")
 
     db, err := sql.Open("sqlite3", "../data/main.db")
     checkErr(err)
 
-    rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s;",table))
+    if(len(filter) > 0){
+        fdata, err := base64.StdEncoding.DecodeString(filter)
+        checkErr(err);
+        command = fmt.Sprintf("SELECT * FROM %s WHERE %s;",table,fdata)
+
+    }else{
+        command = fmt.Sprintf("SELECT * FROM %s",table)
+    }
+
+    rows, err := db.Query(command)
     checkErr(err)
     defer rows.Close()
-
+    // rows, err := db.Query(fmt.Sprintf("SELECT * FROM %s WHERE %s;",table, filter))
+    // checkErr(err)
+    // defer rows.Close()
 
     columnNames, err := rows.Columns()
     checkErr(err)
@@ -44,7 +58,7 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
     }
 
     if(format == "csv"){
-        w.Header().Set("Content-Type", "text/html")
+        w.Header().Set("Content-Type", "text/csv")
         for rows.Next() {
             err := rows.Scan(columnPointers...)
             checkErr(err)
