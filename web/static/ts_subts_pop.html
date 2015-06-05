@@ -31,13 +31,16 @@
 <body>
 <div style="position:relative">
     <h2>ts_subts_pop</h2>
-    <div style="width:600px;">
+<p>BaselineData_Census_2014_Provisional_Results_MIMU_10Oct2014.xlsx</p>
+<p>Provisional Results of the 2014 Myanmar Population and Housing Census</p>
+<p>Distribution of Township and Sub-Township Enumerated Population by Sex, Type of Household and Administrative area (State/Region, District and Township</p>
+<p>>TS+SubTS+Pop</p>
+    <div style="width:1024px;">
         <div id="myGrid" style="width:100%;height:500px;"></div>
     </div>
     <div style="width:600px;">
         <a href="" id="csv_url" target="_blank">CSV URL</a>
         <a href="" id="json_url" target="_blank">JSON URL</a>
-        <input id="getQurl" type="button" value="Get Url"/>
     </div>
 
 
@@ -73,21 +76,21 @@ var columns = [];
 var columnFilters = {};
 
 var columns = [
-{id:"state_name", name:"state_name", field:"state_name", sortable: true, ft: 1},
-{id:"district_name", name:"district_name", field:"district_name", sortable: true, ft: 1},
-{id:"township_pcode", name:"township_pcode", field:"township_pcode", sortable: true, ft: 1},
-{id:"township_name", name:"township_name", field:"township_name", sortable: true, ft: 1},
-{id:"tp_both_sexes", name:"tp_both_sexes", field:"tp_both_sexes", sortable: true, ft: 1},
-{id:"tp_males", name:"tp_males", field:"tp_males", sortable: true, ft: 1},
-{id:"tp_females", name:"tp_females", field:"tp_females", sortable: true, ft: 1},
-{id:"cvh_households", name:"cvh_households", field:"cvh_households", sortable: true, ft: 1},
-{id:"cvh_both_sexes", name:"cvh_both_sexes", field:"cvh_both_sexes", sortable: true, ft: 1},
-{id:"cvh_males", name:"cvh_males", field:"cvh_males", sortable: true, ft: 1},
-{id:"cvh_females", name:"cvh_females", field:"cvh_females", sortable: true, ft: 1},
-{id:"cvh_hh_size", name:"cvh_hh_size", field:"cvh_hh_size", sortable: true, ft: 1},
-{id:"ins_both_sexes", name:"ins_both_sexes", field:"ins_both_sexes", sortable: true, ft: 1},
-{id:"ins_males", name:"ins_males", field:"ins_males", sortable: true, ft: 1},
-{id:"ins_females", name:"ins_females", field:"ins_females", sortable: true, ft: 1},
+{id:"state_name", name:"State", field:"state_name", sortable: true, ft: 1},
+{id:"district_name", name:"District", field:"district_name", sortable: true, ft: 1},
+{id:"township_pcode", name:"Township PCode", field:"township_pcode", sortable: true, ft: 1},
+{id:"township_name", name:"Townshipo", field:"township_name", sortable: true, ft: 1},
+{id:"tp_both_sexes", name:"Total Population Both Sexes", field:"tp_both_sexes", sortable: true, ft: 1},
+{id:"tp_males", name:"Total Population Males", field:"tp_males", sortable: true, ft: 1},
+{id:"tp_females", name:"Toal Population Females", field:"tp_females", sortable: true, ft: 1},
+{id:"cvh_households", name:"Conventional Households Households", field:"cvh_households", sortable: true, ft: 1},
+{id:"cvh_both_sexes", name:"Conventional Households Both Sexes", field:"cvh_both_sexes", sortable: true, ft: 1},
+{id:"cvh_males", name:"Conventional Households Males", field:"cvh_males", sortable: true, ft: 1},
+{id:"cvh_females", name:"Conventional Households Females", field:"cvh_females", sortable: true, ft: 1},
+{id:"cvh_hh_size", name:"Houshold Size", field:"cvh_hh_size", sortable: true, ft: 1},
+{id:"ins_both_sexes", name:"Instituation Both Sexes", field:"ins_both_sexes", sortable: true, ft: 1},
+{id:"ins_males", name:"Institution Males", field:"ins_males", sortable: true, ft: 1},
+{id:"ins_females", name:"Institution Females", field:"ins_females", sortable: true, ft: 1},
 {id:"remark", name:"remark", field:"remark", sortable: true, ft: 1}
 ];
 
