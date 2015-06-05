@@ -30,6 +30,7 @@
 </head>
 <body>
 <div style="position:relative">
+    <h2>state_city_pop</h2>
     <div style="width:600px;">
         <div id="myGrid" style="width:100%;height:500px;"></div>
     </div>
@@ -74,18 +75,14 @@ var columnFilters = {};
 var columns = [
 {id:"state_pcode", name: "state_pcode", field: "state_pcode", sortable: true, ft: 1},
 {id:"state_name", name: "state_name", field: "state_name", sortable: true, ft: 1},
-{id:"tp_both_sexes", name: "tp_both_sexes", field: "tp_both_sexes", sortable: true, ft:1},
-{id:"tp_males", name: "tp_males", field: "tp_males", sortable: true, ft: 1},
-{id:"tp_females", name: "tp_females", field: "tp_females", sortable: true, ft: 1},
-{id:"ub_both_sexes", name: "ub_both_sexes", field: "ub_both_sexes", sortable: true, ft:1},
-{id:"ub_males", name: "ub_males", field: "ub_males", sortable: true, ft: 1},
-{id:"ub_females", name: "ub_females", field: "ub_females", sortable: true, ft: 1},
-{id:"ru_both_sexes", name: "ru_both_sexes", field: "ru_both_sexes", sortable: true, ft:1},
-{id:"ru_males", name: "ru_males", field: "ru_males", sortable: true, ft: 1},
-{id:"ru_females", name: "ru_females", field: "ru_females", sortable: true, ft: 1},
-{id:"pop_ratio", name: "pop_ratio", field: "pop_ratio", sortable: true, ft: 1},
-{id:"mf_ratio", name: "mf_ratio", field: "mf_ratio", sortable: true, ft: 1},
-{id:"remark", name: "remark", field: "remark", sortable: true, ft: 1}
+{id:"city_pcode", name: "city_pcode", field: "city_pcode", sortable: true, ft: 1},
+{id:"city_name", name: "city_name", field: "city_name", sortable: true, ft: 1},
+{id:"household", name: "household", field: "household", sortable: true, ft: 1},
+{id:"total", name: "total", field: "total", sortable: true, ft: 1},
+{id:"male", name: "male", field: "male", sortable: true, ft: 1},
+{id:"female", name: "female", field: "female", sortable: true, ft: 1},
+{id:"hhsize", name: "hhsize", field: "hhsize", sortable: true, ft: 1},
+{id:"mf_ratio", name: "mf_ratio", field: "mf_ratio" , sortable: true, ft: 1}
 ];
 
 var copyManager = new Slick.CellExternalCopyManager();
@@ -244,6 +241,32 @@ function filter(item) {
     return true;
 }
 
+function setupSort(){
+    grid.onSort.subscribe(function (e, args) {
+    var cols = args.sortCols;
+    console.log(cols);
+    data.sort(function (dataRow1, dataRow2) {
+        for (var i = 0, l = cols.length; i < l; i++) {
+            var field = cols[i].sortCol.field;
+            var sign = cols[i].sortAsc ? 1 : -1;
+            var value1 = dataRow1[field], value2 = dataRow2[field];
+            var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+            console.log(result);
+            if (result != 0) {
+                return result;
+            }
+        }
+        return 0;
+    });
+
+    dataView.beginUpdate();
+    dataView.setItems(data);
+    dataView.endUpdate();
+    grid.invalidate();
+    grid.render();
+});
+}
+
 $(function () {
         var data = []; 
 dataView = new Slick.Data.DataView();
@@ -252,30 +275,7 @@ grid = new Slick.Grid("#myGrid", dataView, columns, options);
 grid.setSelectionModel(new Slick.CellSelectionModel());
 grid.registerPlugin(copyManager);
 
-grid.onSort.subscribe(function (e, args) {
-    var cols = args.sortCols;
-    console.log(cols);
-    data.sort(function (dataRow1, dataRow2) {
-        for (var i = 0, l = cols.length; i < l; i++) {
-        var field = cols[i].sortCol.field;
-        var sign = cols[i].sortAsc ? 1 : -1;
-        var value1 = dataRow1[field], value2 = dataRow2[field];
-        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-        console.log(field);
-        console.log(result);
-        if (result != 0) {
-        return result;
-        }
-        }
-        return 0;
-        });
 
-    dataView.beginUpdate();
-    dataView.setItems(data);
-    dataView.endUpdate();
-    grid.invalidate();
-    grid.render();
-});
 
 
 dataView.onRowCountChanged.subscribe(function (e, args) {
@@ -310,7 +310,7 @@ grid.onHeaderRowCellRendered.subscribe(function(e, args) {
 grid.init();
 
 
-    loadData("state_pop");
+    loadData("state_city_pop");
 })
 
 function buildUrl(e){
@@ -318,8 +318,8 @@ function buildUrl(e){
         $.each(columnFilters,function(k,v){
             query.push(k + " like '" + v + "%'");
         });
-        $('#csv_url').attr("href","/q?t=state_pop&f=csv&w=" + $.base64.encode(query.join(" and ")));
-        $('#json_url').attr("href","/q?t=state_pop&f=json&w=" + $.base64.encode(query.join(" and ")));
+        $('#csv_url').attr("href","/q?t=state_city_pop&f=csv&w=" + $.base64.encode(query.join(" and ")));
+        $('#json_url').attr("href","/q?t=state_city_pop&f=json&w=" + $.base64.encode(query.join(" and ")));
     }
 
 
@@ -337,8 +337,9 @@ function loadData(table){
             dataView.setItems(data);
             dataView.setFilter(filter);
             dataView.endUpdate();
-        $('#csv_url').attr("href","/q?t=state_pop&f=csv");
-        $('#json_url').attr("href","/q?t=state_pop&f=json");
+            setupSort();
+        $('#csv_url').attr("href","/q?t=state_city_pop&f=csv");
+        $('#json_url').attr("href","/q?t=state_city_pop&f=json");
         }
     });
 }
