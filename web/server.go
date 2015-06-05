@@ -1,6 +1,7 @@
 package main
 
 import (
+    "encoding/json"
     "strings"
     "database/sql"
     "log"
@@ -22,6 +23,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func queryApi(w http.ResponseWriter, r *http.Request) {
     params := r.URL.Query()
     table := params.Get("t")
+    format := params.Get("f")
 
     db, err := sql.Open("sqlite3", "../data/main.db")
     checkErr(err)
@@ -30,7 +32,6 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
     checkErr(err)
     defer rows.Close()
 
-    w.Header().Set("Content-Type", "text/html")
 
     columnNames, err := rows.Columns()
     checkErr(err)
@@ -42,25 +43,50 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
         columnPointers[i] = &columns[i]
     }
 
-    for rows.Next() {
-        err := rows.Scan(columnPointers...)
-        checkErr(err)
-        for j, col := range columns {
-            switch v := col.(type) {
-            case []byte:
-                cells[j] = fmt.Sprintf("%s",v)
-            case string:
-                cells[j] = fmt.Sprintf("%v",v)
-            case int32, int64:
-                cells[j] = fmt.Sprintf("%v",v)
-            case float32, float64:
-                cells[j] = fmt.Sprintf("%v",v)
-            default:
-                cells[j] = "-"
+    if(format == "csv"){
+        w.Header().Set("Content-Type", "text/html")
+        for rows.Next() {
+            err := rows.Scan(columnPointers...)
+            checkErr(err)
+            for j, col := range columns {
+                switch v := col.(type) {
+                case []byte:
+                    cells[j] = fmt.Sprintf("%s",v)
+                case string:
+                    cells[j] = fmt.Sprintf("%v",v)
+                case int32, int64:
+                    cells[j] = fmt.Sprintf("%v",v)
+                case float32, float64:
+                    cells[j] = fmt.Sprintf("%v",v)
+                default:
+                    cells[j] = "-"
+                }
             }
+            result := fmt.Sprintf("%s\n",strings.Join(cells,","))
+            fmt.Fprintf(w,result)
         }
-        result := fmt.Sprintf("%s\n",strings.Join(cells,","))
-        fmt.Fprintf(w,result)
+    }
+    if(format == "json"){
+        w.Header().Set("Content-Type", "text/json")
+        jrows := []map[string]interface{}{}
+        for rows.Next() {
+            err := rows.Scan(columnPointers...)
+            checkErr(err)
+            jcell := make(map[string]interface{})
+            for j, col := range columns {
+                switch v := col.(type) {
+                case []byte:
+                    jcell[columnNames[j]] = fmt.Sprintf("%s",v)
+                case string:
+                    jcell[columnNames[j]] = fmt.Sprintf("%v",v)
+                default:
+                    jcell[columnNames[j]] = v
+                }
+            }
+            jrows = append(jrows,jcell)
+        }
+        enc := json.NewEncoder(w)
+        enc.Encode(jrows)
     }
 }
 
