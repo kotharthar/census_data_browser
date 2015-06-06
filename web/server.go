@@ -23,6 +23,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
 }
 
+type TableItemTpl struct{
+    Name string
+    Desc string
+}
+
 type TableTpl struct{
     Name string
     Fields []string
@@ -30,6 +35,32 @@ type TableTpl struct{
 
 func ToCamel(args ...interface{}) string {
     return args[0].(string)
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+    db, err := sql.Open("sqlite3", "../data/main.db")
+    checkErr(err)
+
+    command := "SELECT name,desc FROM idx;"
+    rows, err := db.Query(command)
+    defer rows.Close()
+
+    var tableList []TableItemTpl
+
+    for rows.Next() {
+        var name string
+        var desc string
+        rows.Scan(&name,&desc)
+        tableList = append(tableList,TableItemTpl{Name: name, Desc: desc})
+    }
+
+    fm := template.FuncMap{
+        "toCamel": snaker.SnakeToCamel,
+    }
+
+    t, _ := template.New("index").Funcs(fm).ParseFiles("i.html")
+    w.Header().Set("Content-Type", "text/html")
+    t.ExecuteTemplate(w, "i.html", &tableList)
 }
 
 func pageTemplate(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +103,7 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
     if(len(filter) > 0){
         fdata, err := base64.StdEncoding.DecodeString(filter)
         checkErr(err);
+        fmt.Println(fdata)
         command = fmt.Sprintf("SELECT * FROM %s WHERE %s;",table,fdata)
 
     }else{
@@ -144,8 +176,7 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
 
 func main() {
     fs := http.FileServer(http.Dir("static"))
-
-    http.Handle("/", fs)
+    http.HandleFunc("/", indexHandler)
     http.HandleFunc("/t", pageTemplate)
     http.HandleFunc("/q", queryApi)
     http.Handle("/static/", http.StripPrefix("/static/", fs))
