@@ -8,7 +8,9 @@ import (
     "log"
     "fmt"
     "net/http"
+    "html/template"
     _ "github.com/mattn/go-sqlite3"
+    "github.com/serenize/snaker"
 )
 
 func checkErr(err error) {
@@ -19,6 +21,42 @@ func checkErr(err error) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+}
+
+type TableTpl struct{
+    Name string
+    Fields []string
+}
+
+func ToCamel(args ...interface{}) string {
+    return args[0].(string)
+}
+
+func pageTemplate(w http.ResponseWriter, r *http.Request) {
+    var command string
+    params := r.URL.Query()
+    table := params.Get("a")
+
+    db, err := sql.Open("sqlite3", "../data/main.db")
+    checkErr(err)
+
+    command = fmt.Sprintf("SELECT * FROM %s limit 1;",table)
+    rows, err := db.Query(command)
+    checkErr(err)
+    defer rows.Close()
+
+    columnNames, err := rows.Columns()
+    checkErr(err)
+    rows.Close()
+
+    tplData := TableTpl{Name: table, Fields: columnNames, }
+
+    fm := template.FuncMap{
+        "toCamel": snaker.SnakeToCamel,
+    }
+    t, _ := template.New("aok").Funcs(fm).ParseFiles("t.html")
+    w.Header().Set("Content-Type", "text/html")
+    t.ExecuteTemplate(w, "t.html", &tplData)
 }
 
 func queryApi(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +146,7 @@ func main() {
     fs := http.FileServer(http.Dir("static"))
 
     http.Handle("/", fs)
+    http.HandleFunc("/t", pageTemplate)
     http.HandleFunc("/q", queryApi)
     http.Handle("/static/", http.StripPrefix("/static/", fs))
 
