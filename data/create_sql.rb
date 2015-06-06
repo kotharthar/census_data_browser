@@ -24,4 +24,4 @@ File.open("#{tbl}.sql","w") do |f|
     f.puts ".import i_#{tbl}.data #{tbl}"
 end
 
-`sqlite3 data.db < #{tbl}.sql`
+`sqlite3 main.db < #{tbl}.sql`

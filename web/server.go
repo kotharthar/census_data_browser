@@ -38,7 +38,7 @@ func ToCamel(args ...interface{}) string {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-    db, err := sql.Open("sqlite3", "../data/main.db")
+    db, err := sql.Open("sqlite3", "static/main.db")
     checkErr(err)
 
     command := "SELECT name,desc FROM idx;"
@@ -103,7 +103,6 @@ func queryApi(w http.ResponseWriter, r *http.Request) {
     if(len(filter) > 0){
         fdata, err := base64.StdEncoding.DecodeString(filter)
         checkErr(err);
-        fmt.Println(fdata)
         command = fmt.Sprintf("SELECT * FROM %s WHERE %s;",table,fdata)
 
     }else{
