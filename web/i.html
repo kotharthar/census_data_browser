@@ -1,0 +1,11 @@
+<h1>Census Data Tables</h1>
+<ul>
+{{ range $item := . }}
+<li>
+    <a href="/t?a={{$item.Name}}">Browse</a>&nbsp;
+    <a href="/q?t={{$item.Name}}&f=csv" target="_blank">CSV</a>&nbsp;
+    <a href="/q?t={{$item.Name}}&f=json" target="_blank">JSON</a>&nbsp;
+    {{$item.Desc}}
+ </li>
+{{ end }}
+</ul>
