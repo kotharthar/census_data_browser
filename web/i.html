@@ -1,16 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Census Data Browser by Zwenexsys</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+</head>
+<body>
+<div class="row">
+<div class="container">
 <h1>Census Data Browser & API</h1>
 <h2>Browse Online </h2>
 <ul>
-{{ range $item := . }}
-<li>
+    {{ range $item := . }}
+    <li>
     <a href="/t?a={{$item.Name}}">Browse</a>&nbsp;
     <a href="/q?t={{$item.Name}}&f=csv" target="_blank">CSV</a>&nbsp;
     <a href="/q?t={{$item.Name}}&f=json" target="_blank">JSON</a>&nbsp;
     {{$item.Desc}}
- </li>
-{{ end }}
+    </li>
+    {{ end }}
 </ul>
 <h2>Sqlite Database</h2>
 <p>
 <a href="/static/main.db">Download</a>
 </p>
+<br>
+<p>2015 &#10084; <a href="http://www.zwenex.com" target="_blank">Zwenexsys</a></p>
+</div>
+</div>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-35304512-7', 'auto');
+ga('send', 'pageview');
+
+</script>
+</body>
+</html>
